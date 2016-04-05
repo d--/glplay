@@ -10,8 +10,7 @@
 
 /******************************* TUTORIAL CODE ********************************/
 
-GLuint CreateShader(GLenum eShaderType, const char * shaderStr)
-{
+GLuint CreateShader(GLenum eShaderType, const char * shaderStr) {
 	GLuint shader = glCreateShader(eShaderType);
 	glShaderSource(shader, 1, &shaderStr, NULL);
 
@@ -19,64 +18,65 @@ GLuint CreateShader(GLenum eShaderType, const char * shaderStr)
 
 	GLint status;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-	if (status == GL_FALSE)
-	{
+	if (status == GL_FALSE) {
 		GLint infoLogLength;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
 
-                GLchar *strInfoLog = (GLchar *)malloc(sizeof(GLchar) * (infoLogLength + 1));
+        GLchar *strInfoLog = 
+            (GLchar *)malloc(sizeof(GLchar) * (infoLogLength + 1));
 		glGetShaderInfoLog(shader, infoLogLength, NULL, strInfoLog);
 
 		const char *strShaderType = NULL;
-		switch(eShaderType)
-		{
+		switch (eShaderType) {
 		    case GL_VERTEX_SHADER: strShaderType = "vertex"; break;
 		    case GL_GEOMETRY_SHADER: strShaderType = "geometry"; break;
 		    case GL_FRAGMENT_SHADER: strShaderType = "fragment"; break;
 		}
 
-		fprintf(stderr, "Compile failure in %s shader:\n%s\n", strShaderType, strInfoLog);
+		fprintf(stderr, "Compile failure in %s shader:\n%s\n", strShaderType,
+                strInfoLog);
         free(strInfoLog);
 	}
 
 	return shader;
 }
 
-GLuint CreateProgram(const GLuint * shaders, size_t len)
-{
+GLuint CreateProgram(const GLuint * shaders, size_t len) {
 	GLuint program = glCreateProgram();
 
-	for(size_t i = 0; i < len; i++)
+	for (size_t i = 0; i < len; i++) {
 		glAttachShader(program, shaders[i]);
+    }
 
 	glLinkProgram(program);
 
 	GLint status;
 	glGetProgramiv(program, GL_LINK_STATUS, &status);
-	if (status == GL_FALSE)
-	{
+	if (status == GL_FALSE) {
 		GLint infoLogLength;
 		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
 
-		GLchar *strInfoLog = (GLchar *)malloc(sizeof(GLchar) * (infoLogLength + 1));
+		GLchar *strInfoLog = 
+            (GLchar *)malloc(sizeof(GLchar) * (infoLogLength + 1));
 		glGetProgramInfoLog(program, infoLogLength, NULL, strInfoLog);
 		fprintf(stderr, "Linker failure: %s\n", strInfoLog);
 		free(strInfoLog);
 	}
 
-	for(size_t i = 0; i < len; i++)
+	for (size_t i = 0; i < len; i++) {
 		glDetachShader(program, shaders[i]);
+    }
 
 	return program;
 }
 
 const char * strVertexShader = (
-        "#version 330\n"
-        "layout(location = 0) in vec4 position;\n"
-        "void main()\n"
-        "{\n"
-        "   gl_Position = position;\n"
-        "}\n"
+    "#version 330\n"
+    "layout(location = 0) in vec4 position;\n"
+    "void main()\n"
+    "{\n"
+    "   gl_Position = position;\n"
+    "}\n"
 );
 
 const char * strFragmentShader = (
@@ -104,7 +104,6 @@ const float vertexPositions[] = {
 };
 
 GLuint posBufObj;
-GLuint vao;
 
 void initVertexBuffer() {
     glGenBuffers(1, &posBufObj);
@@ -118,6 +117,7 @@ void init() {
     initProgram();
     initVertexBuffer();
 
+    GLuint vao;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 }
@@ -141,24 +141,25 @@ void render() {
 /*************************** END TUTORIAL CODE ********************************/
 
 void key_handler(GLFWwindow* win, int key, int scancode, int action, int mods) {
-    if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
+    if (key == GLFW_KEY_Q && action == GLFW_PRESS)
         glfwSetWindowShouldClose(win, GL_TRUE);
-    }
 }
 
-int main()
-{
+int main() {
     GLFWwindow* window;
 
     /* Initialize the library */
     if (!glfwInit())
         return -1;
 
-    /* Create a windowed mode window and its OpenGL context */
+#ifdef __APPLE__
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+
+    /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
     if (!window) {
         glfwTerminate();
@@ -171,9 +172,8 @@ int main()
 #ifdef _WIN32
     /* Initialize extensions */
     GLenum err = glewInit();
-    if (err != GLEW_OK) {
+    if (err != GLEW_OK)
         fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-    }
 #endif
 
     /* Register input callbacks */
@@ -182,8 +182,7 @@ int main()
     init();
 
     /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
-    {
+    while (!glfwWindowShouldClose(window)) {
         /* Render here */
         render();
 
