@@ -1,0 +1,1 @@
+cc `pkg-config --cflags glfw3` -o glplay glplay.c `pkg-config --static --libs glfw3`

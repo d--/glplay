@@ -1,5 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
+#ifdef _WIN32
 #include <GL/glew.h>
+#endif
+#ifdef __APPLE__
+#define GLFW_INCLUDE_GLCOREARB
+#endif
 #include <GLFW/glfw3.h>
 
 /******************************* TUTORIAL CODE ********************************/
@@ -18,8 +24,7 @@ GLuint CreateShader(GLenum eShaderType, const char * shaderStr)
 		GLint infoLogLength;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
 
-        GLchar *strInfoLog = (GLchar *)malloc(sizeof(GLchar) * (infoLogLength + 1));
-		// GLchar *strInfoLog = new GLchar[infoLogLength + 1];
+                GLchar *strInfoLog = (GLchar *)malloc(sizeof(GLchar) * (infoLogLength + 1));
 		glGetShaderInfoLog(shader, infoLogLength, NULL, strInfoLog);
 
 		const char *strShaderType = NULL;
@@ -150,6 +155,10 @@ int main()
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
     if (!window) {
         glfwTerminate();
@@ -159,11 +168,13 @@ int main()
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
+#ifdef _WIN32
     /* Initialize extensions */
     GLenum err = glewInit();
     if (err != GLEW_OK) {
         fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
     }
+#endif
 
     /* Register input callbacks */
     glfwSetKeyCallback(window, key_handler);

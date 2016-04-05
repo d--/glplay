@@ -1,2 +1,2 @@
 @echo off
-..\build\win32_glplay.exe
+..\build\glplay.exe
