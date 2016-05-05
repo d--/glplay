@@ -8,66 +8,72 @@
 #endif
 #include <GLFW/glfw3.h>
 
-/******************************* TUTORIAL CODE ********************************/
+/******************************* TUTORIAL CODE *******************************/
 
 GLuint CreateShader(GLenum eShaderType, const char * shaderStr) {
-	GLuint shader = glCreateShader(eShaderType);
-	glShaderSource(shader, 1, &shaderStr, NULL);
+    GLuint shader = glCreateShader(eShaderType);
 
-	glCompileShader(shader);
+    glShaderSource(shader, 1, &shaderStr, NULL);
+    glCompileShader(shader);
 
-	GLint status;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-	if (status == GL_FALSE) {
-		GLint infoLogLength;
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
+    GLint status;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+    if (status == GL_FALSE) {
+        GLint infoLogLength;
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
 
         GLchar *strInfoLog = 
             (GLchar *)malloc(sizeof(GLchar) * (infoLogLength + 1));
-		glGetShaderInfoLog(shader, infoLogLength, NULL, strInfoLog);
+        glGetShaderInfoLog(shader, infoLogLength, NULL, strInfoLog);
 
-		const char *strShaderType = NULL;
-		switch (eShaderType) {
-		    case GL_VERTEX_SHADER: strShaderType = "vertex"; break;
-		    case GL_GEOMETRY_SHADER: strShaderType = "geometry"; break;
-		    case GL_FRAGMENT_SHADER: strShaderType = "fragment"; break;
-		}
+        const char *strShaderType = NULL;
+        switch (eShaderType) {
+            case GL_VERTEX_SHADER:
+                strShaderType = "vertex";
+                break;
+            case GL_GEOMETRY_SHADER:
+                strShaderType = "geometry";
+                break;
+            case GL_FRAGMENT_SHADER:
+                strShaderType = "fragment";
+                break;
+        }
 
-		fprintf(stderr, "Compile failure in %s shader:\n%s\n", strShaderType,
-                strInfoLog);
+        fprintf(stderr, "Compile failure in %s shader:\n%s\n",
+                strShaderType, strInfoLog);
         free(strInfoLog);
-	}
+    }
 
-	return shader;
+    return shader;
 }
 
 GLuint CreateProgram(const GLuint * shaders, size_t len) {
-	GLuint program = glCreateProgram();
+    GLuint program = glCreateProgram();
 
-	for (size_t i = 0; i < len; i++) {
-		glAttachShader(program, shaders[i]);
+    for (size_t i = 0; i < len; i++) {
+        glAttachShader(program, shaders[i]);
     }
 
-	glLinkProgram(program);
+    glLinkProgram(program);
 
-	GLint status;
-	glGetProgramiv(program, GL_LINK_STATUS, &status);
-	if (status == GL_FALSE) {
-		GLint infoLogLength;
-		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
+    GLint status;
+    glGetProgramiv(program, GL_LINK_STATUS, &status);
+    if (status == GL_FALSE) {
+        GLint infoLogLength;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
 
-		GLchar *strInfoLog = 
+        GLchar *strInfoLog = 
             (GLchar *)malloc(sizeof(GLchar) * (infoLogLength + 1));
-		glGetProgramInfoLog(program, infoLogLength, NULL, strInfoLog);
-		fprintf(stderr, "Linker failure: %s\n", strInfoLog);
-		free(strInfoLog);
-	}
-
-	for (size_t i = 0; i < len; i++) {
-		glDetachShader(program, shaders[i]);
+        glGetProgramInfoLog(program, infoLogLength, NULL, strInfoLog);
+        fprintf(stderr, "Linker failure: %s\n", strInfoLog);
+        free(strInfoLog);
     }
 
-	return program;
+    for (size_t i = 0; i < len; i++) {
+        glDetachShader(program, shaders[i]);
+    }
+
+    return program;
 }
 
 const char * strVertexShader = (
@@ -80,12 +86,12 @@ const char * strVertexShader = (
 );
 
 const char * strFragmentShader = (
-	"#version 330\n"
-	"out vec4 outputColor;\n"
-	"void main()\n"
-	"{\n"
-	"   outputColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"
-	"}\n"
+    "#version 330\n"
+    "out vec4 outputColor;\n"
+    "void main()\n"
+    "{\n"
+    "   outputColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"
+    "}\n"
 );
 
 GLuint program;
@@ -107,9 +113,11 @@ GLuint posBufObj;
 
 void initVertexBuffer() {
     glGenBuffers(1, &posBufObj);
+
     glBindBuffer(GL_ARRAY_BUFFER, posBufObj);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions,
-           GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions),
+    vertexPositions, GL_STATIC_DRAW);
+
     glBindBuffer(GL_ARRAY_BUFFER, 0); 
 }
 
@@ -123,24 +131,25 @@ void init() {
 }
 
 void render() {
-   	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 
-	glUseProgram(program);
+    glUseProgram(program);
 
-	glBindBuffer(GL_ARRAY_BUFFER, posBufObj);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, posBufObj);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
-	glDisableVertexAttribArray(0);
-	glUseProgram(0);
+    glDisableVertexAttribArray(0);
+    glUseProgram(0);
 }
 
-/*************************** END TUTORIAL CODE ********************************/
+/*************************** END TUTORIAL CODE *******************************/
 
-void key_handler(GLFWwindow* win, int key, int scancode, int action, int mods) {
+void key_handler(GLFWwindow* win, int key, int scancode,
+        int action, int mods) {
     if (key == GLFW_KEY_Q && action == GLFW_PRESS)
         glfwSetWindowShouldClose(win, GL_TRUE);
 }
