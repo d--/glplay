@@ -147,11 +147,35 @@ void render() {
 }
 
 /*************************** END TUTORIAL CODE *******************************/
-
 void key_handler(GLFWwindow* win, int key, int scancode,
         int action, int mods) {
     if (key == GLFW_KEY_Q && action == GLFW_PRESS)
         glfwSetWindowShouldClose(win, GL_TRUE);
+}
+
+int w_width = 640;
+int w_height = 480;
+float aspect_ratio = (640.0f / 480.0f);
+
+void resize_handler(GLFWwindow* win, int width, int height) {
+    float v_width = (float) width;
+    float v_height = (float) height;
+
+    float h;
+    if (height > (h = ((float) width / aspect_ratio))) {
+        v_height = h;
+    }
+    float w;
+    if (width > (w = ((float) height * aspect_ratio))) {
+        v_width = w;
+    }
+
+    float x = (width - v_width) / 2.f;
+    float y = (height - v_height) / 2.f;
+
+    glViewport(x, y, v_width, v_height);
+    render();
+    glfwSwapBuffers(win);
 }
 
 int main() {
@@ -169,7 +193,7 @@ int main() {
 #endif
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(w_width, w_height, "Hello World", NULL, NULL);
     if (!window) {
         glfwTerminate();
         return -1;
@@ -185,8 +209,11 @@ int main() {
         fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 #endif
 
-    /* Register input callbacks */
+    /* Register input callback */
     glfwSetKeyCallback(window, key_handler);
+
+    /* Register window size (framebuffer size) callback */
+    glfwSetFramebufferSizeCallback(window, resize_handler);
 
     init();
 
